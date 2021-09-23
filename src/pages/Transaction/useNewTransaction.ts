@@ -8,6 +8,7 @@ import {
   ChainID,
   TransactionVersion,
   GasLimit,
+  Nonce,
 } from "@elrondnetwork/erdjs";
 import {
   gasPrice,
@@ -33,6 +34,9 @@ export default function useNewTransaction() {
       data: new TransactionPayload(rawTransaction.data),
       receiver: new Address(rawTransaction.receiver),
       gasLimit,
+      ...(rawTransaction.nonce
+        ? { nonce: new Nonce(rawTransaction.nonce) }
+        : {}),
       gasPrice: new GasPrice(gasPrice),
       chainID: new ChainID(chainId.valueOf()),
       version: new TransactionVersion(version),

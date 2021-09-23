@@ -16,7 +16,9 @@ import { routeNames } from "routes";
 
 const Actions = () => {
   const sendTransaction = Dapp.useSendTransaction();
-  const { address, dapp } = Dapp.useContext();
+
+  const { address, dapp, account } = Dapp.useContext();
+
   const newTransaction = useNewTransaction();
   const [secondsLeft, setSecondsLeft] = React.useState<number>();
   const [hasPing, setHasPing] = React.useState<boolean>();
@@ -82,6 +84,26 @@ const Actions = () => {
     });
   };
 
+  const sign = (transaction: RawTransactionType) => (e: React.MouseEvent) => {
+    e.preventDefault();
+    const first = newTransaction({
+      ...transaction,
+      nonce: account.nonce.valueOf(),
+      receiver: address,
+      value: "1",
+    });
+    const second = newTransaction({
+      ...transaction,
+      nonce: account.nonce.valueOf() + 1,
+      receiver: address,
+      value: "2",
+    });
+
+    dapp.provider.signTransactions([first, second], {
+      callbackUrl: window.location.origin + routeNames.dashboard,
+    });
+  };
+
   const pongTransaction: RawTransactionType = {
     receiver: contractAddress,
     data: "pong",
@@ -106,6 +128,14 @@ const Actions = () => {
 
   return (
     <div className="d-flex mt-4 justify-content-center">
+      <div className="action-btn" onClick={sign(pingTransaction)}>
+        <button className="btn">
+          <FontAwesomeIcon icon={faArrowUp} className="text-primary" />
+        </button>
+        <a href="/" className="text-white text-decoration-none">
+          Sign
+        </a>
+      </div>
       {hasPing !== undefined && (
         <>
           {hasPing ? (

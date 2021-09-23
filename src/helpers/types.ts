@@ -6,4 +6,5 @@ export interface RawTransactionType {
   data?: string;
   chainID?: string;
   version?: number;
+  nonce?: number;
 }
