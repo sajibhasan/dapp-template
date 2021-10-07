@@ -6,10 +6,11 @@ import {
   ContractFunction,
   Query,
 } from "@elrondnetwork/erdjs";
+import axios from "axios";
 import { faArrowUp, faArrowDown } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import moment from "moment";
-import { contractAddress } from "config";
+import { contractAddress, microserviceAddress } from "config";
 import { RawTransactionType } from "helpers/types";
 import useNewTransaction from "pages/Transaction/useNewTransaction";
 import { routeNames } from "routes";
@@ -43,33 +44,22 @@ const Actions = () => {
   React.useEffect(mount, [hasPing]);
 
   React.useEffect(() => {
-    const query = new Query({
-      address: new Address(contractAddress),
-      func: new ContractFunction("getTimeToPong"),
-      args: [new AddressValue(new Address(address))],
-    });
-    dapp.proxy
-      .queryContract(query)
-      .then(({ returnData }) => {
-        const [encoded] = returnData;
-        switch (encoded) {
-          case undefined:
+    axios
+      .get(`${microserviceAddress}${address}`)
+      .then(({ data }) => {
+        const { status, timeToPong } = data;
+        switch (status) {
+          case "not_yet_pinged":
             setHasPing(true);
             break;
-          case "":
-            setSecondsLeft(0);
+          case "awaiting_pong":
+            setSecondsLeft(timeToPong);
             setHasPing(false);
             break;
-          default: {
-            const decoded = Buffer.from(encoded, "base64").toString("hex");
-            setSecondsLeft(parseInt(decoded, 16));
-            setHasPing(false);
-            break;
-          }
         }
       })
       .catch((err) => {
-        console.error("Unable to call VM query", err);
+        console.error("Unable to call microservice", err);
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
