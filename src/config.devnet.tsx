@@ -24,3 +24,6 @@ export const network: Dapp.NetworkType = {
   gatewayAddress: "https://devnet-gateway.elrond.com",
   explorerAddress: "http://devnet-explorer.elrond.com/",
 };
+
+export const microserviceAddress =
+  "http://127.0.0.1:3001/ping-pong/time-to-pong/";
