@@ -18,7 +18,7 @@ const SignMessage = () => {
           <FontAwesomeIcon icon={faSign} className="text-primary" />
         </button>
         <a href="/" className="text-white text-decoration-none">
-          Ping
+          Sign Message
         </a>
       </div>
       <SignModal
